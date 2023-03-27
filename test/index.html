@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head>
+<title>网盘</title></head><body>
+<h1>网盘</h1>
+
+<h2>上传文件</h2>
+<form>
+<input type="file" name="file">
+<button type="submit">上传</button>
+</form>
+
+<h2>下载文件</h2>
+<ul id="fileList"></ul>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+// 获取文件列表
+axios.get('https://api.github.com/repos/Qumier/CDNtest/contents/')
+.then(function(response) {
+for (var i = 0; i < response.data.length; i++) {
+var file = response.data[i];
+if (file.type === 'file') {
+var li = document.createElement('li');
+var link = document.createElement('a');
+link.href = 'https://cdn.jsdelivr.net/gh/Qumier/CDNtest/' + file.path;
+link.innerText = file.name;
+li.appendChild(link);
+document.getElementById('fileList').appendChild(li);
+}
+}
+})
+.catch(function(error) {
+console.error(error);
+});
+
+// 上传文件
+document.querySelector('form').addEventListener('submit', function(event) {
+event.preventDefault();
+var file = event.target.file.files[0];
+var formData = new FormData();
+formData.append('file', file);
+axios.post('https://api.github.com/repos/Qumier/CDNtest/contents/' + file.name, {
+content: '',
+message: '上传文件：' + file.name,
+branch: 'main'
+}, {
+headers: {
+'Authorization': 'token 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'
+},
+data: formData
+})
+.then(function(response) {
+alert('上传成功');
+location.reload();
+})
+.catch(function(error) {
+console.error(error);
+alert('上传失败');
+});
+});
+</script></body></html>
